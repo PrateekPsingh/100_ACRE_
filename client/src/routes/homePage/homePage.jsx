@@ -13,7 +13,7 @@ function HomePage() {
         <div className="wrapper">
           <h1 className="title">Unlock your perfect stay or investment with ease.</h1>
           <p>
-          Discover your ideal property or perfect hotel stay effortlessly with [Website Name]. Browse curated listings and exclusive rentals tailored to your lifestyle. From luxurious homes to memorable getaways, find what suits you best. Start your journey to exceptional living and unforgettable experiences today.
+          Discover your ideal property or perfect hotel stay effortlessly with 100 ACRE. Browse curated listings and exclusive rentals tailored to your lifestyle. From luxurious homes to memorable getaways, find what suits you best. Start your journey to exceptional living and unforgettable experiences today.
           </p>
           <SearchBar />
           <div className="boxes">
