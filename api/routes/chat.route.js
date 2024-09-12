@@ -4,6 +4,7 @@ import {
   getChat,
   addChat,
   readChat,
+  chat
 } from "../controllers/chat.controller.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -13,5 +14,6 @@ router.get("/", verifyToken, getChats);
 router.get("/:id", verifyToken, getChat);
 router.post("/", verifyToken, addChat);
 router.put("/read/:id", verifyToken, readChat);
+router.post("/chat", verifyToken, chat);
 
 export default router;

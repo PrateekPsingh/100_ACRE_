@@ -24,17 +24,26 @@ const getUser = (userId) => {
 };
 
 io.on("connection", (socket) => {
+  
   socket.on("newUser", (userId) => {
     addUser(userId, socket.id);
+    console.log(`${userId} connected with socket id: ${socket.id}`);
   });
 
   socket.on("sendMessage", ({ receiverId, data }) => {
     const receiver = getUser(receiverId);
-    io.to(receiver.socketId).emit("getMessage", data);
+    if (receiver && receiver.socketId) {
+      io.to(receiver.socketId).emit("getMessage", data);
+      // console.log(`Message sent to user: ${receiverId}`);
+    } else {
+      // console.log(`User with ID ${receiverId} not found or not online`);
+    }
   });
 
+  
   socket.on("disconnect", () => {
     removeUser(socket.id);
+    // console.log(`User with socket id: ${socket.id} disconnected`);
   });
 });
 

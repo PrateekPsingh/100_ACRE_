@@ -1,5 +1,58 @@
 import prisma from "../lib/prisma.js";
 
+export const chat = async (req, res) => {
+  const { postId } = req.body;  
+  const tokenUserId = req.userId;  
+
+  if (!postId) {
+    return res.status(400).json({ message: "Post ID is required" });
+  }
+
+  try {
+    
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,  
+      },
+      select: {
+        userId: true,  
+      },
+    });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const receiverId = post.userId;  
+    const existingChat = await prisma.chat.findFirst({
+      where: {
+        userIDs: {
+          hasEvery: [tokenUserId, receiverId],  
+        },
+      },
+    });
+
+    if (existingChat) {
+      return res.status(200).json({ message: "Chat already initiated", chat: existingChat });
+    }
+
+    
+    const newChat = await prisma.chat.create({
+      data: {
+        userIDs: [tokenUserId, receiverId],  
+      },
+    });
+
+    
+    res.status(200).json({ message: "Chat initiated", chat: newChat });
+  } catch (error) {
+    console.error("Error initiating chat:", error);
+    res.status(500).json({ message: "An error occurred", error: error.message });
+  }
+};
+
+
+
 export const getChats = async (req, res) => {
   const tokenUserId = req.userId;
 
