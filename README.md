@@ -1,4 +1,5 @@
 
+![100ACRE](https://github.com/PrateekPsingh/100_ACRE_/assets/97173401/07a0f9b6-1c7c-432a-95e1-91ea502133a0)
 
 
 # 100ACRE
@@ -71,31 +72,31 @@ To quickly test the search functionality:
 ### Installation Steps
 
 1. Clone the repository
-git clone https://github.com/PrateekPsingh/100.git
+- git clone https://github.com/PrateekPsingh/100.git
 
 2. Navigate to the project directory
-cd hundred-acre
+- cd hundred-acre
 
 3. Start the API server
-cd api
-npm install
-npm run dev
-The server will run on `http://localhost:8800`
+- cd api
+- npm install
+- npm run dev
+- The server will run on `http://localhost:8800`
 
 4. Start the client application
-cd ../client
-npm install
-npm run dev
-The frontend will run on `http://localhost:5174`
+- cd ../client
+- npm install
+- npm run dev
+- The frontend will run on `http://localhost:5174`
 
 5. Start the Socket.io server
-cd ../socket
-npm install
-npm run dev
-Socket.io will run on port 4000
+- cd ../socket
+- npm install
+- npm run dev
+- Socket.io will run on port 4000
 
 6. Access the application
-Open your web browser and go to `http://localhost:5174`
+- Open your web browser and go to `http://localhost:5174`
 
 ### Usage
 - You can now use the Hundred Acre application on your local machine.
