@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiRequest = axios.create({
-  baseURL: "http://localhost:8800/api",
+  baseURL: "https://100-acre-8izx-8t1wkk0co-prateekpsinghs-projects.vercel.app/",
   withCredentials: true,
 });
 
