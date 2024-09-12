@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiRequest = axios.create({
-  baseURL: "https://100-acre-8izx.vercel.app/",
+  baseURL: "https://one00-acre-1.onrender.com/",
   withCredentials: true,
 });
 
