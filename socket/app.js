@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://100-acre-z5d7.vercel.app/",
   },
 });
 
@@ -47,4 +47,8 @@ io.on("connection", (socket) => {
   });
 });
 
-io.listen("4000");
+const PORT = process.env.PORT || 4000;
+io.listen(PORT, () => {
+  console.log(`Socket.IO server running on port ${PORT}`);
+});
+
