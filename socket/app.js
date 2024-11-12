@@ -34,16 +34,16 @@ io.on("connection", (socket) => {
     const receiver = getUser(receiverId);
     if (receiver && receiver.socketId) {
       io.to(receiver.socketId).emit("getMessage", data);
-      // console.log(`Message sent to user: ${receiverId}`);
+      
     } else {
-      // console.log(`User with ID ${receiverId} not found or not online`);
+      
     }
   });
 
   
   socket.on("disconnect", () => {
     removeUser(socket.id);
-    // console.log(`User with socket id: ${socket.id} disconnected`);
+    
   });
 });
 
