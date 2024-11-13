@@ -17,7 +17,7 @@ function SinglePage() {
     if (!currentUser) {
       navigate("/login");
     }
-    // AFTER REACT 19 UPDATE TO USEOPTIMISTIK HOOK
+    
     setSaved((prev) => !prev);
     try {
       await apiRequest.post("/users/save", { postId: post.id });
@@ -33,9 +33,9 @@ function SinglePage() {
     }
   
     try {
-      // Make a POST request to your backend to initiate a chat
+      
       const response = await apiRequest.post("/chats/chat", {
-        postId: post.id,          // Send the post id to the backend  // Send the current user's id
+        postId: post.id,          
       });
   
       console.log("Chat initiated:", response.data);
