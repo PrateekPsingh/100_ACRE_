@@ -1,20 +1,10 @@
 import { Marker, Popup } from "react-leaflet";
 import "./pin.scss";
 import { Link } from "react-router-dom";
-import L from 'leaflet';
-
-const defaultIcon = new L.Icon({
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png", 
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowAnchor: [4, 62],
-  shadowSize: [41, 41],
-});
-
+import {Icon} from 'leaflet';
 function Pin({ item }) {
   return (
-    <Marker position={[item.latitude, item.longitude]} con={defaultIcon} >
+    <Marker position={[item.latitude, item.longitude]} icon={new Icon({iconUrl: '/icon.png', iconSize: [25, 41], iconAnchor: [12, 41]})}>
       <Popup>
         <div className="popupContainer">
           <img src={item.images[0]} alt="" />
