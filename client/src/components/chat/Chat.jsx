@@ -22,12 +22,13 @@ function Chat({ chats }) {
   const handleOpenChat = async (id, receiver) => {
     try {
       const res = await apiRequest("/chats/" + id);
-      if (!res.data.seenBy.includes(currentUser.id)) {
+      const chatData = res.data?.chat || res.data;
+      if (!chatData.seenBy?.includes(currentUser.id)) {
         decrease();
       }
-      setChat({ ...res.data, receiver });
+      setChat({ ...chatData, receiver });
     } catch (err) {
-      console.log(err);
+      console.error("Failed to open chat:", err);
     }
   };
 
@@ -35,41 +36,44 @@ function Chat({ chats }) {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const text = formData.get("text");
+    const text = formData.get("text")?.trim();
 
     if (!text) return;
     try {
       const res = await apiRequest.post("/messages/" + chat.id, { text });
-      setChat((prev) => ({ ...prev, messages: [...prev.messages, res.data] }));
+      const msgData = res.data?.message || res.data;
+      setChat((prev) => ({ ...prev, messages: [...prev.messages, msgData] }));
       e.target.reset();
-      socket.emit("sendMessage", {
+      socket?.emit("sendMessage", {
         receiverId: chat.receiver.id,
-        data: res.data,
+        data: msgData,
       });
     } catch (err) {
-      console.log(err);
+      console.error("Failed to send message:", err);
     }
   };
 
   useEffect(() => {
+    if (!chat || !socket) return;
+
     const read = async () => {
       try {
         await apiRequest.put("/chats/read/" + chat.id);
       } catch (err) {
-        console.log(err);
+        console.error("Failed to mark chat as read:", err);
       }
     };
 
-    if (chat && socket) {
-      socket.on("getMessage", (data) => {
-        if (chat.id === data.chatId) {
-          setChat((prev) => ({ ...prev, messages: [...prev.messages, data] }));
-          read();
-        }
-      });
-    }
+    const handleMessage = (data) => {
+      if (chat.id === data.chatId) {
+        setChat((prev) => ({ ...prev, messages: [...prev.messages, data] }));
+        read();
+      }
+    };
+
+    socket.on("getMessage", handleMessage);
     return () => {
-      socket.off("getMessage");
+      socket.off("getMessage", handleMessage);
     };
   }, [socket, chat]);
 
@@ -83,14 +87,14 @@ function Chat({ chats }) {
             key={c.id}
             style={{
               backgroundColor:
-                c.seenBy.includes(currentUser.id) || chat?.id === c.id
+                c.seenBy?.includes(currentUser.id) || chat?.id === c.id
                   ? "white"
                   : "#fecd514e",
             }}
             onClick={() => handleOpenChat(c.id, c.receiver)}
           >
-            <img src={c.receiver.avatar || "/noavatar.jpg"} alt="" />
-            <span>{c.receiver.username}</span>
+            <img src={c.receiver?.avatar || "/noavatar.jpg"} alt="" />
+            <span>{c.receiver?.username}</span>
             <p>{c.lastMessage}</p>
           </div>
         ))}
@@ -99,15 +103,15 @@ function Chat({ chats }) {
         <div className="chatBox">
           <div className="top">
             <div className="user">
-              <img src={chat.receiver.avatar || "noavatar.jpg"} alt="" />
-              {chat.receiver.username}
+              <img src={chat.receiver?.avatar || "/noavatar.jpg"} alt="" />
+              {chat.receiver?.username}
             </div>
             <span className="close" onClick={() => setChat(null)}>
               X
             </span>
           </div>
           <div className="center">
-            {chat.messages.map((message) => (
+            {chat.messages?.map((message) => (
               <div
                 className="chatMessage"
                 style={{

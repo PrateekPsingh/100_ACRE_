@@ -3,41 +3,37 @@ import prisma from "../lib/prisma.js";
 export const addMessage = async (req, res) => {
   const tokenUserId = req.userId;
   const chatId = req.params.chatId;
-  const text = req.body.text;
+  const text = req.body.text?.trim();
+
+  if (!text) {
+    return res.status(400).json({ success: false, message: "Message text is required." });
+  }
 
   try {
     const chat = await prisma.chat.findUnique({
       where: {
         id: chatId,
-        userIDs: {
-          hasSome: [tokenUserId],
-        },
+        userIDs: { hasSome: [tokenUserId] },
       },
     });
 
-    if (!chat) return res.status(404).json({ message: "Chat not found!" });
+    if (!chat) return res.status(404).json({ success: false, message: "Chat not found." });
 
     const message = await prisma.message.create({
-      data: {
-        text,
-        chatId,
-        userId: tokenUserId,
-      },
+      data: { text, chatId, userId: tokenUserId },
     });
 
     await prisma.chat.update({
-      where: {
-        id: chatId,
-      },
+      where: { id: chatId },
       data: {
-        seenBy: [tokenUserId],
+        seenBy: { push: [tokenUserId] },
         lastMessage: text,
       },
     });
 
-    res.status(200).json(message);
+    res.status(200).json({ success: true, message });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to add message!" });
+    console.error("addMessage error:", err);
+    res.status(500).json({ success: false, message: "Failed to add message." });
   }
 };

@@ -1,6 +1,5 @@
 import "./register.scss";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useState } from "react";
 import apiRequest from "../../lib/apiRequest";
 
@@ -12,28 +11,30 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("")
-    setIsLoading(true);
-    const formData = new FormData(e.target);
+    setError("");
 
+    const formData = new FormData(e.target);
     const username = formData.get("username");
     const email = formData.get("email");
     const password = formData.get("password");
 
-    try {
-      const res = await apiRequest.post("/auth/register", {
-        username,
-        email,
-        password,
-      });
+    // Client-side validation
+    if (!username || username.length < 3) return setError("Username must be at least 3 characters.");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return setError("Invalid email format.");
+    if (!password || password.length < 6) return setError("Password must be at least 6 characters.");
 
+    setIsLoading(true);
+    try {
+      await apiRequest.post("/auth/register", { username, email, password });
       navigate("/login");
     } catch (err) {
-      setError(err.response.data.message);
+      setError(err.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="registerPage">
       <div className="formContainer">

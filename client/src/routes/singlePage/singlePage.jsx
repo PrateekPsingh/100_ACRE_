@@ -10,19 +10,21 @@ import apiRequest from "../../lib/apiRequest";
 function SinglePage() {
   const post = useLoaderData();
   const [saved, setSaved] = useState(post.isSaved);
+  const [error, setError] = useState("");
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSave = async () => {
     if (!currentUser) {
       navigate("/login");
+      return;
     }
-    
+
     setSaved((prev) => !prev);
     try {
       await apiRequest.post("/users/save", { postId: post.id });
     } catch (err) {
-      console.log(err);
+      console.error("Failed to save post:", err);
       setSaved((prev) => !prev);
     }
   };
@@ -30,21 +32,17 @@ function SinglePage() {
   const handleMessageClick = async () => {
     if (!currentUser) {
       navigate("/login");
+      return;
     }
-  
+
     try {
-      
-      const response = await apiRequest.post("/chats/chat", {
-        postId: post.id,          
-      });
-  
-      console.log("Chat initiated:", response.data);
+      await apiRequest.post("/chats/chat", { postId: post.id });
       navigate("/profile");
     } catch (err) {
       console.error("Error initiating chat:", err);
+      setError("Failed to start chat. Please try again.");
     }
   };
-  
 
   return (
     <div className="singlePage">
@@ -62,14 +60,14 @@ function SinglePage() {
                 <div className="price">$ {post.price}</div>
               </div>
               <div className="user">
-                <img src={post.user.avatar} alt="" />
-                <span>{post.user.username}</span>
+                <img src={post.user?.avatar || "/noavatar.jpg"} alt="" />
+                <span>{post.user?.username}</span>
               </div>
             </div>
             <div
               className="bottom"
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(post.postDetail.desc),
+                __html: DOMPurify.sanitize(post.postDetail?.desc || ""),
               }}
             ></div>
           </div>
@@ -83,7 +81,7 @@ function SinglePage() {
               <img src="/utility.png" alt="" />
               <div className="featureText">
                 <span>Utilities</span>
-                {post.postDetail.utilities === "owner" ? (
+                {post.postDetail?.utilities === "owner" ? (
                   <p>Owner is responsible</p>
                 ) : (
                   <p>Tenant is responsible</p>
@@ -94,7 +92,7 @@ function SinglePage() {
               <img src="/pet.png" alt="" />
               <div className="featureText">
                 <span>Pet Policy</span>
-                {post.postDetail.pet === "allowed" ? (
+                {post.postDetail?.pet === "allowed" ? (
                   <p>Pets Allowed</p>
                 ) : (
                   <p>Pets not Allowed</p>
@@ -105,7 +103,7 @@ function SinglePage() {
               <img src="/fee.png" alt="" />
               <div className="featureText">
                 <span>Income Policy</span>
-                <p>{post.postDetail.income}</p>
+                <p>{post.postDetail?.income}</p>
               </div>
             </div>
           </div>
@@ -113,7 +111,7 @@ function SinglePage() {
           <div className="sizes">
             <div className="size">
               <img src="/size.png" alt="" />
-              <span>{post.postDetail.size} sqft</span>
+              <span>{post.postDetail?.size} sqft</span>
             </div>
             <div className="size">
               <img src="/bed.png" alt="" />
@@ -131,9 +129,9 @@ function SinglePage() {
               <div className="featureText">
                 <span>School</span>
                 <p>
-                  {post.postDetail.school > 999
+                  {post.postDetail?.school > 999
                     ? post.postDetail.school / 1000 + "km"
-                    : post.postDetail.school + "m"}{" "}
+                    : post.postDetail?.school + "m"}{" "}
                   away
                 </p>
               </div>
@@ -142,14 +140,14 @@ function SinglePage() {
               <img src="/pet.png" alt="" />
               <div className="featureText">
                 <span>Bus Stop</span>
-                <p>{post.postDetail.bus}m away</p>
+                <p>{post.postDetail?.bus}m away</p>
               </div>
             </div>
             <div className="feature">
               <img src="/fee.png" alt="" />
               <div className="featureText">
                 <span>Restaurant</span>
-                <p>{post.postDetail.restaurant}m away</p>
+                <p>{post.postDetail?.restaurant}m away</p>
               </div>
             </div>
           </div>
@@ -158,19 +156,17 @@ function SinglePage() {
             <Map items={[post]} />
           </div>
           <div className="buttons">
+            {error && <span className="error">{error}</span>}
             <button onClick={handleMessageClick}>
               <img src="/chat.png" alt="" />
               Send a Message
             </button>
             <button
               onClick={handleSave}
-              style={{
-                backgroundColor: saved ? "#fece51" : "white",
-              }}
+              style={{ backgroundColor: saved ? "#fece51" : "white" }}
             >
               <img src="/save.png" alt="" />
               {saved ? "Place Saved" : "Save the Place"}
-              {console.log(post.id)}
             </button>
           </div>
         </div>

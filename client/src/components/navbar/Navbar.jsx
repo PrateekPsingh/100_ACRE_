@@ -3,6 +3,7 @@ import "./navbar.scss";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useNotificationStore } from "../../lib/notificationStore";
+import { useEffect } from "react";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -12,7 +13,9 @@ function Navbar() {
   const fetch = useNotificationStore((state) => state.fetch);
   const number = useNotificationStore((state) => state.number);
 
-  if(currentUser) fetch();
+  useEffect(() => {
+    if (currentUser) fetch();
+  }, [currentUser, fetch]);
 
   return (
     <nav>

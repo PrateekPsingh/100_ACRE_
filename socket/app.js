@@ -1,16 +1,20 @@
 import { Server } from "socket.io";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const io = new Server({
   cors: {
-    origin: "https://100-acre-z5d7.vercel.app",
+    origin: process.env.CLIENT_URL || "http://localhost:5174",
+    methods: ["GET", "POST"],
   },
 });
 
 let onlineUser = [];
 
 const addUser = (userId, socketId) => {
-  const userExits = onlineUser.find((user) => user.userId === userId);
-  if (!userExits) {
+  const userExists = onlineUser.find((user) => user.userId === userId);
+  if (!userExists) {
     onlineUser.push({ userId, socketId });
   }
 };
@@ -24,26 +28,34 @@ const getUser = (userId) => {
 };
 
 io.on("connection", (socket) => {
-  
   socket.on("newUser", (userId) => {
-    addUser(userId, socket.id);
-    console.log(`${userId} connected with socket id: ${socket.id}`);
-  });
-
-  socket.on("sendMessage", ({ receiverId, data }) => {
-    const receiver = getUser(receiverId);
-    if (receiver && receiver.socketId) {
-      io.to(receiver.socketId).emit("getMessage", data);
-      
-    } else {
-      
+    try {
+      if (!userId || typeof userId !== "string") return;
+      addUser(userId, socket.id);
+      console.log(`User ${userId} connected (socket: ${socket.id})`);
+    } catch (err) {
+      console.error("newUser error:", err);
     }
   });
 
-  
+  socket.on("sendMessage", ({ receiverId, data } = {}) => {
+    try {
+      if (!receiverId || !data) return;
+      const receiver = getUser(receiverId);
+      if (receiver?.socketId) {
+        io.to(receiver.socketId).emit("getMessage", data);
+      }
+    } catch (err) {
+      console.error("sendMessage error:", err);
+    }
+  });
+
   socket.on("disconnect", () => {
-    removeUser(socket.id);
-    
+    try {
+      removeUser(socket.id);
+    } catch (err) {
+      console.error("disconnect error:", err);
+    }
   });
 });
 
@@ -52,3 +64,14 @@ io.listen(PORT, () => {
   console.log(`Socket.IO server running on port ${PORT}`);
 });
 
+// Graceful shutdown
+const shutdown = () => {
+  console.log("Shutting down socket server...");
+  io.close(() => {
+    console.log("Socket.IO server closed.");
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

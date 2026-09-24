@@ -11,12 +11,19 @@ function NewPostPage() {
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     const formData = new FormData(e.target);
     const inputs = Object.fromEntries(formData);
+
+    if (!inputs.title) return setError("Title is required.");
+    if (!inputs.price || Number(inputs.price) <= 0) return setError("Price must be positive.");
+    if (!inputs.address) return setError("Address is required.");
+    if (!inputs.city) return setError("City is required.");
+    if (!images.length) return setError("At least one image is required.");
 
     try {
       const res = await apiRequest.post("/posts", {
@@ -44,10 +51,10 @@ function NewPostPage() {
           restaurant: parseInt(inputs.restaurant),
         },
       });
-      navigate("/"+res.data.id)
+      const postId = res.data?.post?.id || res.data?.id;
+      navigate("/" + postId);
     } catch (err) {
-      console.log(err);
-      setError(error);
+      setError(err.response?.data?.message || "Failed to create post. Please try again.");
     }
   };
 
@@ -96,14 +103,12 @@ function NewPostPage() {
             <div className="item">
               <label htmlFor="type">Type</label>
               <select name="type">
-                <option value="rent" defaultChecked>
-                  Rent
-                </option>
+                <option value="rent">Rent</option>
                 <option value="buy">Buy</option>
               </select>
             </div>
             <div className="item">
-              <label htmlFor="type">Property</label>
+              <label htmlFor="property">Property</label>
               <select name="property">
                 <option value="apartment">Apartment</option>
                 <option value="house">House</option>
@@ -111,7 +116,6 @@ function NewPostPage() {
                 <option value="land">Land</option>
               </select>
             </div>
-
             <div className="item">
               <label htmlFor="utilities">Utilities Policy</label>
               <select name="utilities">
@@ -129,12 +133,7 @@ function NewPostPage() {
             </div>
             <div className="item">
               <label htmlFor="income">Income Policy</label>
-              <input
-                id="income"
-                name="income"
-                type="text"
-                placeholder="Income Policy"
-              />
+              <input id="income" name="income" type="text" placeholder="Income Policy" />
             </div>
             <div className="item">
               <label htmlFor="size">Total Size (sqft)</label>
@@ -145,7 +144,7 @@ function NewPostPage() {
               <input min={0} id="school" name="school" type="number" />
             </div>
             <div className="item">
-              <label htmlFor="bus">bus</label>
+              <label htmlFor="bus">Bus</label>
               <input min={0} id="bus" name="bus" type="number" />
             </div>
             <div className="item">
@@ -153,7 +152,7 @@ function NewPostPage() {
               <input min={0} id="restaurant" name="restaurant" type="number" />
             </div>
             <button className="sendButton">Add</button>
-            {error && <span>error</span>}
+            {error && <span className="error">{error}</span>}
           </form>
         </div>
       </div>

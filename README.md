@@ -1,108 +1,188 @@
-# Deployed Link
-https://100-acre-z5d7.vercel.app
+# 100 ACRE
+
+A MERN stack property listing application for buying and renting properties, with real-time messaging.
 
 ![100ACRE](https://github.com/PrateekPsingh/100_ACRE_/assets/97173401/07a0f9b6-1c7c-432a-95e1-91ea502133a0)
 
+**Live demo:** https://100-acre-z5d7.vercel.app
 
-# 100ACRE
+---
 
-100 Acre is a MERN stack application designed to help users search for properties to buy or rent. With advanced filtering options, user login functionality, and messaging capabilities, it provides a seamless experience for both property seekers and owners.
+## Tech Stack
 
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, React Router v6, Zustand, Socket.IO Client |
+| Backend | Node.js, Express |
+| Database | MongoDB Atlas via Prisma ORM |
+| Real-time | Socket.IO |
+| Image upload | Cloudinary Upload Widget |
+| Styling | SCSS |
+| Map | Leaflet / React-Leaflet |
 
-<!-- ## Deployed link
-
-https://pennybase.vercel.app/ -->
+---
 
 ## Features
 
-### User Authentication
-- **User Login:** Secure login for existing users.
-- **User Register:** Easy registration for new users.
+- User registration and login (JWT, HTTP-only cookies)
+- Profile management with avatar upload
+- Create, view, and delete property listings
+- Search and filter properties (location, type, price, bedrooms)
+- Save/unsave properties
+- Real-time messaging between users via Socket.IO
+- Interactive map with property pins
 
-### User Profile Management
-- **Profile Update:** Users can update their profile information including username and password.
-- **Upload Avatar:** Users can upload their profile pictures using Cloudinary.
+---
 
-### Property Posts
-- **Create Post:** Users can create posts for properties they want to sell or rent.
-- **Upload Property Pictures:** Users can upload images of their properties via Cloudinary.
+## Project Structure
 
-### Browsing and Interaction
-- **Search Properties:** Users can search for properties based on location, number of bedrooms, and type.
-- **View Posts:** All users can browse and view property posts.
-- **Save Posts:** Users can save posts for future reference.
-- **Send Message:** Each post has a "Send Message" button allowing users to send text messages to the post owner.
-- **Chat:** Users can message each other and engage in real-time chat.
+```
+100_ACRE_/
+├── api/          # Express REST API (port 8800)
+├── client/       # React frontend (port 5174)
+└── socket/       # Socket.IO server (port 4000)
+```
 
+---
 
-## Technologies Used
+## Prerequisites
 
-- **MERN:** MongoDB, Express, React, Node.js
-- **Cloudinary:** For image uploads
-- **Prisma:** For database management
-- **Zustand:** For state management
-- **Socket.io:** For real-time messaging
+- Node.js 18+
+- MongoDB Atlas account (or local MongoDB)
+- Cloudinary account (for image uploads)
 
-## Quick Use Guide
+---
 
-### Demo Users
-For testing purposes, two dummy users have been created:
+## Environment Variables
 
-1. Admin Account
-   - Username: admin
-   - Password: 123
+### `api/.env`
+Copy `api/.env.example` and fill in your values:
+```env
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/100acre?appName=Cluster0
+JWT_SECRET_KEY=your_strong_random_secret_here
+CLIENT_URL=http://localhost:5174
+PORT=8800
+NODE_ENV=development
+```
 
-2. Regular User Account
-   - Username: user
-   - Password: 123
+### `socket/.env`
+Copy `socket/.env.example`:
+```env
+PORT=4000
+CLIENT_URL=http://localhost:5174
+```
 
-### Search Examples
-To quickly test the search functionality:
+### `client/.env`
+Copy `client/.env.example` (optional for local dev — Vite proxy handles routing):
+```env
+VITE_API_URL=http://localhost:8800/api
+VITE_SOCKET_URL=http://localhost:4000
+```
 
-1. Search for properties in Lucknow:
-   - Enter "Lucknow" in the location field
-   - Set price range from 0 to 1000
+> **Never commit `.env` files.** They are in `.gitignore`. Only `.env.example` files are committed.
 
-2. Search for properties in Jabalpur:
-   - Enter "Jabalpur" in the location field
-   - Set price range from 0 to 1000
+---
 
+## Local Setup
 
-## Local Installation Guide
+### 1. Clone the repository
+```bash
+git clone https://github.com/PrateekPsingh/100_ACRE_.git
+cd 100_ACRE_
+```
 
+### 2. API server
+```bash
+cd api
+cp .env.example .env        # fill in your values
+npm install
+npm run dev
+# → http://localhost:8800
+```
 
-### Installation Steps
+### 3. Socket.IO server
+```bash
+cd socket
+cp .env.example .env
+npm install
+npm run dev
+# → http://localhost:4000
+```
 
-1. Clone the repository
-- git clone https://github.com/PrateekPsingh/100.git
+### 4. React client
+```bash
+cd client
+npm install
+npm run dev
+# → http://localhost:5174
+```
 
-2. Navigate to the project directory
-- cd hundred-acre
+Open http://localhost:5174 in your browser.
 
-3. Start the API server
-- cd api
-- npm install
-- npm run dev
-- The server will run on `http://localhost:8800`
+The Vite dev server proxies `/api/*` to port 8800 and `/socket.io` to port 4000 automatically — no CORS configuration needed for local development.
 
-4. Start the client application
-- cd ../client
-- npm install
-- npm run dev
-- The frontend will run on `http://localhost:5174`
+---
 
-5. Start the Socket.io server
-- cd ../socket
-- npm install
-- npm run dev
-- Socket.io will run on port 4000
+## Database Setup
 
-6. Access the application
-- Open your web browser and go to `http://localhost:5174`
+1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Create a database user and get your connection string
+3. Add the connection string to `api/.env` as `DATABASE_URL` — include the database name:
+   ```
+   mongodb+srv://user:pass@cluster.mongodb.net/100acre?appName=Cluster0
+   ```
+4. Run the Prisma migration:
+   ```bash
+   cd api
+   npx prisma db push
+   ```
 
-### Usage
-- You can now use the Hundred Acre application on your local machine.
-- Search for properties, create listings, and interact with other users.
+---
 
+## API Overview
 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | /api/auth/register | No | Register new user |
+| POST | /api/auth/login | No | Login |
+| POST | /api/auth/logout | No | Logout |
+| GET | /api/posts | No | Get posts (with filters) |
+| GET | /api/posts/:id | No | Get single post |
+| POST | /api/posts | Yes | Create post |
+| PUT | /api/posts/:id | Yes | Update post (owner only) |
+| DELETE | /api/posts/:id | Yes | Delete post (owner only) |
+| PUT | /api/users/:id | Yes | Update profile |
+| DELETE | /api/users/:id | Yes | Delete account |
+| POST | /api/users/save | Yes | Save/unsave post |
+| GET | /api/users/profilePosts | Yes | Get own posts + saved posts |
+| GET | /api/users/notification | Yes | Get unread chat count |
+| GET | /api/chats | Yes | Get all chats |
+| GET | /api/chats/:id | Yes | Get chat with messages |
+| POST | /api/chats/chat | Yes | Initiate chat from a post |
+| PUT | /api/chats/read/:id | Yes | Mark chat as read |
+| POST | /api/messages/:chatId | Yes | Send message |
 
+Query params for `GET /api/posts`: `city`, `type` (buy/rent), `property` (apartment/house/condo/land), `bedroom`, `minPrice`, `maxPrice`
+
+---
+
+## Production / Deployment Notes
+
+- Set `NODE_ENV=production` in the API environment
+- Cookies are set with `secure: true` and `sameSite: none` in production
+- Set `CLIENT_URL` in both `api/.env` and `socket/.env` to your frontend's deployed URL
+- Set `VITE_API_URL` and `VITE_SOCKET_URL` in `client/.env` to your deployed API/socket URLs before building
+- Run `npm run build` in the client directory for production static files
+
+---
+
+## Demo Accounts
+
+| Username | Password | Role |
+|----------|----------|------|
+| admin | 123 | Admin |
+| user | 123 | User |
+
+### Sample search queries
+- Location: **Lucknow**, price range 0–1000
+- Location: **Jabalpur**, price range 0–1000

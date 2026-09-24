@@ -14,22 +14,32 @@ function ProfileUpdatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     const formData = new FormData(e.target);
 
     const { username, email, password } = Object.fromEntries(formData);
+
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return setError("Invalid email format.");
+      }
+    }
+    if (password && password.length < 6) {
+      return setError("Password must be at least 6 characters.");
+    }
 
     try {
       const res = await apiRequest.put(`/users/${currentUser.id}`, {
         username,
         email,
-        password,
-        avatar:avatar[0]
+        password: password || undefined,
+        avatar: avatar[0],
       });
       updateUser(res.data);
       navigate("/profile");
     } catch (err) {
-      console.log(err);
-      setError(err.response.data.message);
+      setError(err.response?.data?.message || "Update failed. Please try again.");
     }
   };
 
@@ -58,10 +68,10 @@ function ProfileUpdatePage() {
           </div>
           <div className="item">
             <label htmlFor="password">Password</label>
-            <input id="password" name="password" type="password" />
+            <input id="password" name="password" type="password" placeholder="Leave blank to keep current" />
           </div>
           <button>Update</button>
-          {error && <span>error</span>}
+          {error && <span className="error">{error}</span>}
         </form>
       </div>
       <div className="sideContainer">

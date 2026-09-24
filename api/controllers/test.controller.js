@@ -1,21 +1,19 @@
 import jwt from "jsonwebtoken";
 
-export const shouldBeLoggedIn = async (req, res) => {
-  console.log(req.userId)
-  res.status(200).json({ message: "You are Authenticated" });
+export const shouldBeLoggedIn = (req, res) => {
+  res.status(200).json({ success: true, message: "You are authenticated." });
 };
 
-export const shouldBeAdmin = async (req, res) => {
+export const shouldBeAdmin = (req, res, next) => {
   const token = req.cookies.token;
 
-  if (!token) return res.status(401).json({ message: "Not Authenticated!" });
+  if (!token) return res.status(401).json({ success: false, message: "Not authenticated." });
 
-  jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-    if (err) return res.status(403).json({ message: "Token is not Valid!" });
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, payload) => {
+    if (err) return res.status(403).json({ success: false, message: "Token is not valid." });
     if (!payload.isAdmin) {
-      return res.status(403).json({ message: "Not authorized!" });
+      return res.status(403).json({ success: false, message: "Not authorized." });
     }
+    next();
   });
-
-  res.status(200).json({ message: "You are Authenticated" });
 };
