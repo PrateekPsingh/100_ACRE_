@@ -19,7 +19,7 @@ function ListPage() {
               errorElement={<p>Error loading posts!</p>}
             >
               {(postResponse) =>
-                postResponse.data.map((post) => (
+                (postResponse.data?.posts || postResponse.data || []).map((post) => (
                   <Card key={post.id} item={post} />
                 ))
               }
@@ -33,7 +33,7 @@ function ListPage() {
             resolve={data.postResponse}
             errorElement={<p>Error loading posts!</p>}
           >
-            {(postResponse) => <Map items={postResponse.data} />}
+            {(postResponse) => <Map items={postResponse.data?.posts || postResponse.data || []} />}
           </Await>
         </Suspense>
       </div>

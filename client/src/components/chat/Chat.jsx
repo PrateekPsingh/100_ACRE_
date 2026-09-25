@@ -22,7 +22,7 @@ function Chat({ chats }) {
   const handleOpenChat = async (id, receiver) => {
     try {
       const res = await apiRequest("/chats/" + id);
-      const chatData = res.data?.chat || res.data;
+      const chatData = res.data?.chat || res.chat || res.data?.chats || res?.chats || res.data || res;
       if (!chatData.seenBy?.includes(currentUser.id)) {
         decrease();
       }
