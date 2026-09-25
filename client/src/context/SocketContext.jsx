@@ -9,7 +9,8 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io();
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || "/";
+    const newSocket = io(socketUrl);
     newSocket.on("connect_error", (err) => {
       console.error("Socket connection error:", err.message);
     });
